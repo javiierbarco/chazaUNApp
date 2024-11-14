@@ -1,0 +1,71 @@
+{
+  "project_info": {
+    "project_number": "198907188314",
+    "firebase_url": "https://chazaunapp-original-default-rtdb.firebaseio.com",
+    "project_id": "chazaunapp-original",
+    "storage_bucket": "chazaunapp-original.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:198907188314:android:522cfb95f371db02667463",
+        "android_client_info": {
+          "package_name": "com.queremoscancelar.chazaunapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "198907188314-jauk4fivc5q5gjgl39q9nndr28157f6g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.queremoscancelar.chazaunapp",
+            "certificate_hash": "bde5ec934dbf2ea6beb31aacaedc74592f41e51d"
+          }
+        },
+        {
+          "client_id": "198907188314-lpkatfai33prhca9fdp4397j2q51q53i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.queremoscancelar.chazaunapp",
+            "certificate_hash": "d0b74ec27e8f4c0a5d1bf97332adc4b032e60abd"
+          }
+        },
+        {
+          "client_id": "198907188314-pbddhmtlhfpdh3k6olpekedsapuh00r3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.queremoscancelar.chazaunapp",
+            "certificate_hash": "23ef8225e395a582e4ab725b45911dd5d28e3606"
+          }
+        },
+        {
+          "client_id": "198907188314-t5fhj7r2dff4j06c6r2iu3l9fv29oraj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkvy_hV3NkB29rcHOG0iWj3gIOip1ePkg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "198907188314-raa9jdp7lipk2ajgg5pkj3fpd01dcup1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "198907188314-fa0t3dav0n31m5kd9d4aiooatb1l9grv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.chazaunapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
