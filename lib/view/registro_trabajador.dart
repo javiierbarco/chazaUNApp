@@ -1,3 +1,4 @@
+// view/registro_trabajador.dart
 // ignore_for_file: avoid_print
 
 import 'package:chazaunapp/Services/gauth_service.dart';
@@ -130,11 +131,11 @@ class AgreeCheck extends StatefulWidget {
 class _Checkbox extends State<AgreeCheck> {
   @override
   Widget build(BuildContext context) {
-    Color getColor(Set<MaterialState> states) {
-      const Set<MaterialState> interactiveStates = <MaterialState>{
-        MaterialState.pressed,
-        MaterialState.hovered,
-        MaterialState.focused,
+    Color getColor(Set<WidgetState> states) {
+      const Set<WidgetState> interactiveStates = <WidgetState>{
+        WidgetState.pressed,
+        WidgetState.hovered,
+        WidgetState.focused,
       };
       if (states.any(interactiveStates.contains)) {
         return colorTrabajador;
@@ -150,7 +151,7 @@ class _Checkbox extends State<AgreeCheck> {
           children: [
             Checkbox(
                 checkColor: colorBackground,
-                fillColor: MaterialStateProperty.resolveWith(getColor),
+                fillColor: WidgetStateProperty.resolveWith(getColor),
                 value: isChecked,
                 onChanged: (bool? value) {
                   setState(() {

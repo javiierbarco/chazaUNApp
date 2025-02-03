@@ -1,3 +1,4 @@
+// view/Sprint2/configuracion_vista.dart
 import 'package:chazaunapp/view/colors.dart';
 import 'package:flutter/material.dart';
 
@@ -175,7 +176,7 @@ class _ConfiguracionVistaState extends State<ConfiguracionVista> {
 
   ElevatedButton cerrarSesionBoton_() {
     return ElevatedButton(
-        style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.red.shade400)),
+        style: ButtonStyle(backgroundColor: WidgetStateProperty.all<Color>(Colors.red.shade400)),
           onPressed: cerrarSesion_(),
           child: const Text(
             "Cerrar sesión",

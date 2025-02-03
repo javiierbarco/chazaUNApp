@@ -1,9 +1,10 @@
+// view/menu_inicia_cards/fill_image_card.dart
 import 'package:flutter/material.dart';
 import 'package:chazaunapp/view/menu_inicia_cards/image_card_content.dart';
 
 class FillImageCard extends StatelessWidget {
   const FillImageCard({
-    Key? key,
+    super.key,
     this.width,
     this.height,
     this.heightImage,
@@ -17,7 +18,7 @@ class FillImageCard extends StatelessWidget {
     this.color = Colors.white,
     this.tagSpacing,
     this.tagRunSpacing,
-  }) : super(key: key);
+  });
 
   /// card width
   final double? width;

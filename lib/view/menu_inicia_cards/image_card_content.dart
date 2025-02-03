@@ -1,8 +1,9 @@
+// view/menu_inicia_cards/image_card_content.dart
 import 'package:flutter/material.dart';
 
 class ImageCardContent extends StatelessWidget {
   const ImageCardContent({
-    Key? key,
+    super.key,
     this.contentPadding,
     this.tags,
     this.title,
@@ -10,7 +11,7 @@ class ImageCardContent extends StatelessWidget {
     this.footer,
     this.tagSpacing,
     this.tagRunSpacing,
-  }) : super(key: key);
+  });
 
   final EdgeInsetsGeometry? contentPadding;
   final List<Widget>? tags;

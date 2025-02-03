@@ -1,3 +1,4 @@
+// Services/gauth_service.dart
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -67,12 +68,8 @@ class GAuthService {
   //Nombre de la cuenta
   getNombreCompleto() {
     String? nombre = FirebaseAuth.instance.currentUser?.displayName;
-    if (nombre == null) {
-      print('e');
-    } else {
-      return nombre;
+    return nombre;
     }
-  }
 
   //email registrado
   getEmail() {
