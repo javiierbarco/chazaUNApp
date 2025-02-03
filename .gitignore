@@ -54,3 +54,5 @@ macos/
 web/
 linux/
 ```
+env/
+.vscode/
