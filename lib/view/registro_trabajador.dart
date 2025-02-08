@@ -1,10 +1,10 @@
-// view/registro_trabajador.dart
-// ignore_for_file: avoid_print
-
+import 'package:chazaunapp/Controller/registro_controller.dart';
 import 'package:chazaunapp/Services/gauth_service.dart';
 import 'package:chazaunapp/view/inicio.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'colors.dart';
 
@@ -12,7 +12,11 @@ import 'colors.dart';
 const String _title = 'Registro';
 //Verificación de los terminos y condiciones
 bool isChecked = false;
-//Cuenta de google
+//TERMINOS Y CONDICIONES
+const terminos =
+    'https://doc-hosting.flycricket.io/chazaunapp-terms-of-use/61d6b708-bd87-4bb3-8392-cc8b9ab1fe48/terms';
+const policy =
+    'https://doc-hosting.flycricket.io/chazaunapp-privacy-policy/f674154c-f1f3-4291-a55f-77743561a2b2/privacy';
 
 class RegistroTrabajadorView extends StatefulWidget {
   const RegistroTrabajadorView({super.key});
@@ -23,22 +27,65 @@ class RegistroTrabajadorView extends StatefulWidget {
 
 class _RegistroTrabajadorState extends State<RegistroTrabajadorView> {
   @override
+  void initState() {
+    super.initState();
+    phoneController.addListener(phoneValidator);
+  }
+
+  @override
+  void dispose() {
+    phoneController.clear();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
           color: colorBackground,
           alignment: Alignment.center,
-          child: const Column(
+          child: Column(
             children: [
-              Title(), //Banner azul
-              Flexible(
-                  //espacio
-                  flex: 1,
-                  child: SizedBox(
-                    height: 300,
-                  )),
-              LoginButton(),
-              Center(child: AgreeCheck()), //checkbox de terminos y condiciones
+              const Title(), //Banner azul
+              const Spacer(),
+              const Padding(
+                padding: EdgeInsets.all(40.0),
+                child: Text(
+                  'Necesitamos tu número de teléfono para que te puedan contactar',
+                  style: TextStyle(
+                      color: Colors.black, // Establece el color del texto
+                      fontSize: 20.0, // Establece el tamaño del texto
+                      fontFamily: "Inder",
+                      fontWeight: FontWeight.normal),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(40.0),
+                child: TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  controller: phoneController,
+                  validator: (val) {
+                    return phoneValidator_;
+                  },
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                      filled: true,
+                      fillColor: colorFondoField,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      labelText: "Teléfono",
+                      labelStyle: TextStyle(color: Colors.grey.shade700),
+                      suffixIcon: const Icon(Icons.phone)),
+                ),
+              ),
+              const LoginButton(),
+              const Center(
+                  child: AgreeCheck()), //checkbox de terminos y condiciones
+              const Spacer(),
             ],
           )),
     );
@@ -87,18 +134,34 @@ class _LoginButton extends State<LoginButton> {
   @override
   Widget build(BuildContext context) {
     return SignInButton(
-      Buttons.Google,
+      Buttons.GoogleDark,
       text: 'Ingresar con google unal',
       onPressed: () async {
-        if (isChecked) {
+        if (!isChecked) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Por favor acepta nuestros términos y condiciones.'),
+            duration: Duration(seconds: 2),
+          ));
+        } else if (!isValid) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(
+              'Ingresa tu número de telefono.',
+            ),
+            duration: Duration(seconds: 2),
+          ));
+        } else {
           try {
-            await GAuthService().ingresarGoogle();
+            await GAuthService()
+                .ingresarGoogle(true, phoneController.text, context);
             await goMenu();
           } catch (e) {
-            print('ingresa con cuenta unal');
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text(
+                'Hubo un error, intenta más tarde.',
+              ),
+              backgroundColor: Colors.red,
+            ));
           }
-        } else {
-          print('No ha aceptado');
         }
       },
     );
@@ -118,9 +181,6 @@ class _LoginButton extends State<LoginButton> {
   }
 }
 
-//TERMINOS Y CONDICIONES
-//https://doc-hosting.flycricket.io/chazaunapp-terms-of-use/61d6b708-bd87-4bb3-8392-cc8b9ab1fe48/terms
-//https://doc-hosting.flycricket.io/chazaunapp-privacy-policy/f674154c-f1f3-4291-a55f-77743561a2b2/privacy
 class AgreeCheck extends StatefulWidget {
   const AgreeCheck({super.key});
 
@@ -158,23 +218,49 @@ class _Checkbox extends State<AgreeCheck> {
                     isChecked = value!;
                   });
                 }),
-            const Expanded(
-                child: Text(
-              'Acepto los términos y condiciones.', // el texto que quieres mostrar
-              style: TextStyle(
-                  color: Colors.black, // Establece el color del texto
-                  fontSize: 12.0, // Establece el tamaño del texto
-                  fontFamily: "Inder",
-                  fontWeight: FontWeight.normal),
-              textAlign: TextAlign.center,
-            )),
+            Expanded(
+                child: RichText(
+                    text: TextSpan(children: [
+              const TextSpan(
+                text: 'Acepto los ', // el texto que quieres mostrar
+                style: TextStyle(
+                    color: Colors.black, // Establece el color del texto
+                    fontSize: 12.0, // Establece el tamaño del texto
+                    fontFamily: "Inder",
+                    fontWeight: FontWeight.normal),
+              ),
+              TextSpan(
+                  text: 'términos y condiciones',
+                  style: const TextStyle(
+                      color: colorPrincipal, // Establece el color del texto
+                      fontSize: 12.0, // Establece el tamaño del texto
+                      fontFamily: "Inder",
+                      fontWeight: FontWeight.normal),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () async {
+                      launchUrl(Uri.parse(terminos));
+                    }),
+              const TextSpan(
+                text: ' y nuestra ', // el texto que quieres mostrar
+                style: TextStyle(
+                    color: Colors.black, // Establece el color del texto
+                    fontSize: 12.0, // Establece el tamaño del texto
+                    fontFamily: "Inder",
+                    fontWeight: FontWeight.normal),
+              ),
+              TextSpan(
+                  text: 'política de privacidad.',
+                  style: const TextStyle(
+                      color: colorPrincipal, // Establece el color del texto
+                      fontSize: 12.0, // Establece el tamaño del texto
+                      fontFamily: "Inder",
+                      fontWeight: FontWeight.normal),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () async {
+                      launchUrl(Uri.parse(policy));
+                    })
+            ]))),
           ],
         ));
-  }
-
-  menuTrabajador() {
-    return () {
-      Navigator.pushNamed(context, '/menu/trabajador');
-    };
   }
 }

@@ -68,8 +68,10 @@ class _LoginVistaState extends State<LoginVista> {
   }
 
   SizedBox barraSuperior_() {
+    final screenSize = MediaQuery.of(context).size;
+    final screenHeight = screenSize.height*0.25;
     return SizedBox(
-      height: 186.0,
+      height: screenHeight,
       child: Container(
         decoration: const BoxDecoration(
           color:

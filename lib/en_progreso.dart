@@ -15,7 +15,7 @@ class _EnProgresoState extends State<EnProgreso> {
         backgroundColor: colorBackground,
         body: Center(
           child: Column(
-            children:  [
+            children: [
               const SizedBox(height: 320),
               const Icon(
                 Icons.design_services_outlined,
@@ -35,11 +35,10 @@ class _EnProgresoState extends State<EnProgreso> {
               inicioSesionButtom_()
             ],
           ),
-        )
-      );
+        ));
   }
 
-    ElevatedButton inicioSesionButtom_() {
+  ElevatedButton inicioSesionButtom_() {
     return ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: colorChazero,
@@ -50,13 +49,12 @@ class _EnProgresoState extends State<EnProgreso> {
         ),
         onPressed: verificar_,
         child: const Text(
-          "Voler",
+          "Volver",
           style: TextStyle(color: Colors.black, fontSize: 18),
         ));
   }
-  
+
   verificar_() {
     Navigator.pop(context);
   }
-  
 }

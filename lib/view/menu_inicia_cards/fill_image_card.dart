@@ -1,4 +1,3 @@
-// view/menu_inicia_cards/fill_image_card.dart
 import 'package:flutter/material.dart';
 import 'package:chazaunapp/view/menu_inicia_cards/image_card_content.dart';
 

@@ -8,8 +8,11 @@ Future<List> getChazasporChazero(String idChazero) async {
   QuerySnapshot querychazas = await collectionReferenceChazas
       .where('ID_Chazero', isEqualTo: idChazero)
       .get();
-  for (var id in querychazas.docs) {
-    chazas.add(id.data());
+  for (var chaza in querychazas.docs) {
+    Map<String, dynamic> chazaData = chaza.data() as Map<String, dynamic>; // Datos del documento
+    chazaData['id'] = chaza.id; // Agregar el ID del documento a los datos
+
+    chazas.add(chazaData); // Agregar los datos a la lista 'chazas'
   }
   Future.delayed(const Duration(milliseconds: 800));
 

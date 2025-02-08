@@ -1,4 +1,3 @@
-// view/menu_inicia_cards/image_card_content.dart
 import 'package:flutter/material.dart';
 
 class ImageCardContent extends StatelessWidget {

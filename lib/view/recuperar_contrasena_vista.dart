@@ -25,15 +25,16 @@ class _ContrasenaVistaState extends State<ContrasenaVista>{
           color: colorBackground,
           child: Column(
             children: [
+              const SizedBox(height: 100,),
               // Titulo "¿Olvidaste tu Contraseña?
               const SizedBox(
-                height: 200,
+                height: 100,
                 child: Center(
                   child: Text(
                     "¿Olvidaste tu\n contraseña?",
                     style: TextStyle(
                         color: Colors.black,
-                        fontSize: 24.0,
+                        fontSize: 32.0,
                         fontFamily: "Inder"
                     ),
                   ),
@@ -54,7 +55,7 @@ class _ContrasenaVistaState extends State<ContrasenaVista>{
               ),
               InputEmailVista(emailTextController: emailTextController),
               enviarCorreoButton(),
-              const SizedBox(height: 40,),
+              const SizedBox(height: 100,),
             ],
           )
         ),
@@ -70,7 +71,7 @@ class _ContrasenaVistaState extends State<ContrasenaVista>{
             mostrarMensaje(emailTextController.text);
 
           } on FirebaseAuthException {
-            print(emailTextController.text);
+            //print(emailTextController.text);
           }
         },
         style: ElevatedButton.styleFrom(

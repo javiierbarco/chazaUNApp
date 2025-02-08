@@ -1,7 +1,10 @@
-// view/Sprint2/configuracion_vista.dart
+import 'package:app_settings/app_settings.dart';
 import 'package:chazaunapp/view/colors.dart';
+import 'package:chazaunapp/view/inicio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../Services/Sprint2/info_personal_services.dart';
 
 class ConfiguracionVista extends StatefulWidget {
   const ConfiguracionVista({super.key});
@@ -10,7 +13,37 @@ class ConfiguracionVista extends StatefulWidget {
   State<ConfiguracionVista> createState() => _ConfiguracionVistaState();
 }
 
+User? usuario = FirebaseAuth.instance.currentUser;
+
 class _ConfiguracionVistaState extends State<ConfiguracionVista> {
+  late TextEditingController controllerCampo;
+  String nombre = '';
+  String apellido = '';
+  List<dynamic> resultado = [];
+  @override
+  void initState() {
+    super.initState();
+    obtenerInfoPersonal();
+  }
+
+  Future<void> obtenerInfoPersonal() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String uid = user.uid;
+        resultado = await traerInfoGeneral(uid);
+
+        setState(() {
+          nombre = resultado[4];
+          apellido = resultado[3];
+        }); // Actualizar el estado para mostrar los datos en el widget
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print('Error al obtener la información personal: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,16 +61,22 @@ class _ConfiguracionVistaState extends State<ConfiguracionVista> {
           color: Color(0xffAEB4B7),
           thickness: 2,
         ),
-        opciones_(Icons.account_box, "Cuenta","Privacidad, Visibilidad, Editar Perfil", cuentaMove_()),
-        opciones_(Icons.notifications, "Notificaciones", "Perfil",notificacionesMove_()),
-        opciones_(Icons.help_outline_outlined,"Ayuda","Preguntas frecuentes, soporte, \n politica de privacidad",notificacionesMove_()),
-        const SizedBox(height: 30,),
+        opciones_(Icons.account_box, "Cuenta",
+            "Privacidad, Visibilidad, Editar Perfil", cuentaMove_()),
+        opciones_(Icons.notifications, "Notificaciones", "Perfil",
+            notificacionesMove_()),
+        opciones_(
+            Icons.help_outline_outlined,
+            "Ayuda",
+            "Preguntas frecuentes, soporte, \n politica de privacidad",
+            ayudaMove_()),
+        const SizedBox(
+          height: 30,
+        ),
         cerrarSesionBoton_()
-        ]
-      ),
+      ]),
     );
   }
-
 
   Stack barraConfiguracion_() {
     return Stack(children: [
@@ -71,8 +110,11 @@ class _ConfiguracionVistaState extends State<ConfiguracionVista> {
   }
 
   volverInicio_() {
-    return () {//No modificar, esto directamente manda a la anterior ventana
-      Navigator.pop(context,);
+    return () {
+      //No modificar, esto directamente manda a la anterior ventana
+      Navigator.pop(
+        context,
+      );
     };
   }
 
@@ -83,30 +125,25 @@ class _ConfiguracionVistaState extends State<ConfiguracionVista> {
           width: 10,
         ),
         Container(
-          width: 65.0,
-          height: 65.0,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.grey.shade300,
-          ),
-          child: const Icon(
-            Icons.person,
-            color: Colors.grey,
-            size: 60,
-          ),
-        ),
+            width: 65.0,
+            height: 65.0,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.grey.shade300,
+            ),
+            child: fotoActual()),
         const SizedBox(
           width: 10,
         ),
-        nombreTxt_()
+        nombreTxt_('$nombre $apellido')
       ],
     );
   }
 
-  Text nombreTxt_() {
-    return const Text(
-      "Marco Perez",
-      style: TextStyle(fontSize: 30),
+  Text nombreTxt_(String nombre) {
+    return Text(
+      nombre,
+      style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
     );
   }
 
@@ -158,40 +195,55 @@ class _ConfiguracionVistaState extends State<ConfiguracionVista> {
 
   cuentaMove_() {
     return () {
-      Navigator.pushNamed(context, '/progreso');
+      Navigator.pushNamed(context, '/menu/configuracion/infoPersonalChazero');
     };
   }
 
   notificacionesMove_() {
     return () {
-      Navigator.pushNamed(context, '/progreso');
+      AppSettings.openAppSettings();
     };
   }
 
   ayudaMove_() {
     return () {
-      Navigator.pushNamed(context, '/progreso');
+      Navigator.pushNamed(context, '/menu/configuracion/contactanos');
     };
   }
 
   ElevatedButton cerrarSesionBoton_() {
     return ElevatedButton(
-        style: ButtonStyle(backgroundColor: WidgetStateProperty.all<Color>(Colors.red.shade400)),
-          onPressed: cerrarSesion_(),
-          child: const Text(
-            "Cerrar sesión",
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.black,
-              fontWeight: FontWeight.bold
-            ),
-          )
-        );
+        style: ButtonStyle(
+            backgroundColor:
+                WidgetStateProperty.all<Color>(Colors.red.shade400)),
+        onPressed: cerrarSesion_(),
+        child: const Text(
+          "Cerrar sesión",
+          style: TextStyle(
+              fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+        ));
   }
 
   cerrarSesion_() {
     return () {
-      Navigator.pushNamed(context, '/');
+      FirebaseAuth.instance.signOut();
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => const PaginaInicio(),
+        ),
+        //Esta funcion es para decidir hasta donde hacer pop, ej: ModalRoute.withName('/'));, como está ahí borra todoo
+        (_) => false,
+      );
     };
+  }
+
+  CircleAvatar fotoActual() {
+    return const CircleAvatar(
+      radius: 50,
+      backgroundImage: NetworkImage(
+        'https://cnnespanol.cnn.com/wp-content/uploads/2016/08/juan-gabriel-pleno.jpg?quality=100&strip=info',
+      ),
+    );
   }
 }

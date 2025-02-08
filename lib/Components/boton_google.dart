@@ -1,8 +1,7 @@
 import 'package:chazaunapp/Services/gauth_service.dart';
 import 'package:chazaunapp/view/colors.dart';
+import 'package:chazaunapp/view/inicio.dart';
 import 'package:flutter/material.dart';
-
-import '../view/menu_inicial_vista.dart';
 
 //Verificación de los terminos y condiciones
 bool isChecked = true;
@@ -19,7 +18,7 @@ class _BotonGoogle extends State<BotonGoogle> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: () => GAuthService().ingresarGoogle(),
+        onTap: () => GAuthService().ingresarGoogle(false, "", context),
         child: Column(mainAxisSize: MainAxisSize.max, children: [
           const SizedBox(
             height: 10,
@@ -72,7 +71,13 @@ class _BotonGoogle extends State<BotonGoogle> {
 
   //async para esperar el ingreso
   goMenu() async {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) =>  const MenuInicialVistaView()));
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => const PaginaInicio(),
+      ),
+      //Esta funcion es para decidir hasta donde hacer pop, ej: ModalRoute.withName('/'));, como está ahí borra todoo
+      (_) => false,
+    );
   }
 }

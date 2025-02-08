@@ -1,8 +1,18 @@
 import 'package:chazaunapp/en_progreso.dart';
+import 'package:chazaunapp/view/Sprint2/configuracion_trabajador_vista.dart';
 import 'package:chazaunapp/view/Sprint2/configuracion_vista.dart';
+import 'package:chazaunapp/view/Sprint2/contactanos_vista.dart';
+import 'package:chazaunapp/view/Sprint2/info_cuenta.dart';
+import 'package:chazaunapp/view/Sprint2/info_cuenta_trabajador.dart';
 import 'package:chazaunapp/view/Sprint2/perfil_chazero_vista.dart';
 import 'package:chazaunapp/view/Sprint2/perfil_trabajador_vista.dart';
-import 'package:chazaunapp/view/codigo_vista.dart';
+import 'package:chazaunapp/view/Sprint2/personal_vista.dart';
+import 'package:chazaunapp/view/Sprint2/registro_chaza_vista.dart';
+import 'package:chazaunapp/view/Sprint3/calendario_chaza_vista.dart';
+import 'package:chazaunapp/view/Sprint3/horarios_chaza_chazero.dart';
+import 'package:chazaunapp/view/Sprint3/postulados_chaza.dart';
+import 'package:chazaunapp/view/Sprint3/info_chaza_vista.dart';
+// ignore: unused_import
 import 'package:chazaunapp/view/inicio.dart';
 import 'package:chazaunapp/view/menu_inicial_chazero_vista.dart';
 import 'package:chazaunapp/view/menu_inicial_vista.dart';
@@ -36,21 +46,40 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Material App',
-      initialRoute: '/', //prueba
+      title: 'ChazaUNApp',
+      initialRoute: '/',
       routes: {
         '/': (context) => const PaginaInicio(),
         '/contrasena': (context) => const ContrasenaVista(),
         '/registro/selector': (context) => const SelectorVista(),
         '/registro/trabajador': (context) => const RegistroTrabajadorView(),
         '/registro/chazero': (context) => const RegistroChazeroVista(),
-        '/registro/chazero/codigo': (context) => const CodigoVista(),
-        '/menu/chazero': (context) => const MenuChazeroVista(),
-        '/menu/trabajador': (context) =>  const MenuInicialVistaView(),
+        '/menu/chazero': (context) => const MenuChazeroVista(""),
+        '/menu/chazero/horario': (context) =>
+            const HorarioChazaChazeroVista(nombreChaza: "", idHorario: ""),
+        '/menu/chazero/personal': (context) => const PersonalVista(),
+        '/menu/chazero/registrar/chaza': (context) => const RegistrarChaza(),
+        '/menu/trabajador': (context) => const MenuInicialVistaView(),
         '/menu/trabajador/perfil': (context) => const PerfilTrabajadorVista(),
+        '/menu/trabajador/chaza/horario': (context) => const HorarioChazaVista(
+              nombreChaza: '',
+              idHorario: '',
+            ),
+        '/menu/trabajador/chaza/postulacion': (context) => const PostuladosChaza(idChaza: '',),
+
         '/menu/chazero/perfil': (context) => const PerfilChazeroVista(),
         '/menu/configuracion': (context) => const ConfiguracionVista(),
+        '/menu/configuracionTrabajo': (context) =>
+            const ConfiguracionTrabajoVista(),
         '/progreso': (context) => const EnProgreso(),
+        '/menu/configuracion/contactanos': (context) => const ContactanosView(),
+        '/menu/configuracion/infoPersonalChazero': (context) =>
+            const InfoCuenta(),
+        '/menu/configuracion/infoPersonalTrabajador': (context) =>
+            const InfoCuentaTrabajador(),
+
+        '/menu/chazas/informacion': (context) => const  InfoChazaVista()
+
       },
     );
   }

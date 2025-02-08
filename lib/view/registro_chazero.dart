@@ -1,10 +1,14 @@
+import 'package:chazaunapp/Services/services_registrochazero.dart';
 import 'package:chazaunapp/view/menu_inicial_chazero_vista.dart';
 import 'package:chazaunapp/view/verificar_correo_vista.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../Components/boton_google.dart';
 import 'colors.dart';
-import 'package:chazaunapp/Services/services_registrochazero.dart';
 
 class RegistroChazeroVista extends StatefulWidget {
   const RegistroChazeroVista({super.key});
@@ -36,7 +40,6 @@ class _RegistroChazeroVistaState extends State<RegistroChazeroVista> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     emailController.addListener(emailValidator);
@@ -78,7 +81,11 @@ class _RegistroChazeroVistaState extends State<RegistroChazeroVista> {
               telefonoInput(),
               //aca debe ir el de confirmar
               const SizedBox(height: 40),
-              registroButtom_()
+              const Center(
+                child: AgreeCheck(),
+              ),
+              const SizedBox(height: 20,),
+              registroButtom_(),
             ],
           ),
         )),
@@ -87,8 +94,10 @@ class _RegistroChazeroVistaState extends State<RegistroChazeroVista> {
   }
 
   SizedBox barraSuperior_() {
+    final screenSize = MediaQuery.of(context).size;
+    final screenHeight = screenSize.height*0.25;
     return SizedBox(
-      height: 186.0,
+      height: screenHeight,
       child: Container(
         decoration: const BoxDecoration(
           color:
@@ -149,6 +158,7 @@ class _RegistroChazeroVistaState extends State<RegistroChazeroVista> {
         keyboardType: TextInputType.text,
         obscureText: true,
         decoration: InputDecoration(
+            errorMaxLines: 2,
             filled: true,
             fillColor: colorFondoField,
             border: OutlineInputBorder(
@@ -298,7 +308,7 @@ class _RegistroChazeroVistaState extends State<RegistroChazeroVista> {
         validator: (val) {
           return telefonoValidator_;
         },
-        keyboardType: TextInputType.text,
+        keyboardType: TextInputType.phone,
         decoration: InputDecoration(
             filled: true,
             fillColor: colorFondoField,
@@ -312,7 +322,12 @@ class _RegistroChazeroVistaState extends State<RegistroChazeroVista> {
     );
   }
 
-
+  /*Checkbox checkbox() {
+    return Checkbox(
+      value: null,
+      onChanged:,
+    );
+  }*/
 
   ElevatedButton registroButtom_() {
     return ElevatedButton(
@@ -324,18 +339,16 @@ class _RegistroChazeroVistaState extends State<RegistroChazeroVista> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.0)),
         ),
         onPressed: () async {
+          await emailValidator();
+          contrasenaValidator();
+          contrasenaConfirmacionValidator();
+          telefonoValidator();
+          primerNombreValidator();
+          segundoNombreValidator();
+          primerApellidoValidator();
+          segundoApellidoValidator();
+
           if (_formKey.currentState!.validate()) {
-
-            // crea un documento de chazero en FireStore Database
-            crearChazero(
-                emailController.text,
-                contrasenaController.text,
-                primerNombreController.text,
-                segundoNombreController.text,
-                primerApellidoController.text,
-                segundoApellidoController.text,
-                telefonoController.text);
-
             // Crea un usuario en Firebase Auth y lo logea automaticamente
             await FirebaseAuth.instance.createUserWithEmailAndPassword(
                 email: emailController.text,
@@ -344,9 +357,25 @@ class _RegistroChazeroVistaState extends State<RegistroChazeroVista> {
                 email: emailController.text,
                 password: contrasenaController.text);
 
+            // crea un documento de chazero en Firebase Firestore
+            crearChazero(
+                emailController.text,
+                contrasenaController.text,
+                primerNombreController.text,
+                segundoNombreController.text,
+                primerApellidoController.text,
+                segundoApellidoController.text,
+                telefonoController.text,
+                FirebaseAuth.instance.currentUser?.uid);
+
+            FirebaseAuth.instance.currentUser?.updateDisplayName(
+                '${primerNombreController.text} ${segundoNombreController.text}');
             // comentar este if para no hacer la verificacion
             if (context.mounted) {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const VerificacionEmail()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const VerificacionEmail()));
             }
 
             // quitar este comentario para poder acceder sin la verificacion
@@ -375,6 +404,7 @@ class _RegistroChazeroVistaState extends State<RegistroChazeroVista> {
 
   void contrasenaValidator() {
     contrasenaConfirmacionValidator();
+    var contrasena = contrasenaController.text;
     /*
     al menos una mayuscula
     al menos una minuscula
@@ -383,18 +413,26 @@ class _RegistroChazeroVistaState extends State<RegistroChazeroVista> {
     minimo 8 caracteres
     (?=.*?[!@#\$&*~]) carac
      */
-    RegExp regex =
-        RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$');
-    if (contrasenaController.text.isEmpty) {
+    RegExp regexMinus = RegExp(r'[A-Z]');
+    RegExp regexMayus = RegExp(r'[a-z]');
+    RegExp regexNumeros = RegExp(r'[0-9]');
+    RegExp regexCaracteres = RegExp(r'^.{8,16}$');
+
+    if (contrasena.isEmpty) {
       contrasenaValidator_ = "Por favor ingrese su contrasena";
       _formKey.currentState!.validate();
-    } else if (!regex.hasMatch(contrasenaController.text)) {
-      contrasenaValidator_ = "Ingrese una contrasena valida";
+    } else if (!regexCaracteres.hasMatch(contrasena)) {
+      contrasenaValidator_ = "La contraseña debe tener entre 8 y 16 caracteres";
+      _formKey.currentState!.validate();
+    } else if (!regexMinus.hasMatch(contrasena) || !regexMayus.hasMatch(contrasena)) {
+      contrasenaValidator_ = "La contraseña debe contener al menos una letra mayúscula y una minúscula";
+      _formKey.currentState!.validate();
+    } else if (!regexNumeros.hasMatch(contrasenaController.text)){
+      contrasenaValidator_ = "La contraseña debe contener al menos un número";
       _formKey.currentState!.validate();
     } else {
       contrasenaValidator_ = null;
       _formKey.currentState!.validate();
-
     }
   }
 
@@ -405,7 +443,6 @@ class _RegistroChazeroVistaState extends State<RegistroChazeroVista> {
     } else {
       contrasenaConfirmacionValidator_ = null;
       _formKey.currentState!.validate();
-
     }
   }
 
@@ -413,45 +450,40 @@ class _RegistroChazeroVistaState extends State<RegistroChazeroVista> {
     if (telefonoController.text.isEmpty) {
       telefonoValidator_ = "Por favor ingrese su numero";
       _formKey.currentState!.validate();
-
     } else if (telefonoController.text.length != 10) {
       telefonoValidator_ = "Ingrese un numero valido";
       _formKey.currentState!.validate();
-
     } else {
       telefonoValidator_ = null;
       _formKey.currentState!.validate();
-
     }
   }
 
   void primerNombreValidator() {
-    RegExp regExp = RegExp(r"^[a-zA-Z]+$");
+    RegExp regExp = RegExp(r".*[A-Za-z].*");
     if (primerNombreController.text.isEmpty) {
       primerNombreValidator_ = "Ingrese su nombre";
       _formKey.currentState!.validate();
-
     } else if (!regExp.hasMatch(primerNombreController.text)) {
       primerNombreValidator_ = "Ingrese un nombre valido";
       _formKey.currentState!.validate();
-
     } else {
       primerNombreValidator_ = null;
       _formKey.currentState!.validate();
-
     }
   }
 
   void segundoNombreValidator() {
     RegExp regExp = RegExp(r"^[a-zA-Z]+$");
-    if (!regExp.hasMatch(primerNombreController.text)) {
+    if (segundoNombreController.text.isEmpty){
+      segundoNombreValidator_ = null;
+      _formKey.currentState!.validate();
+    } else if (!regExp.hasMatch(segundoNombreController.text)) {
       segundoNombreValidator_ = "Ingrese un nombre valido";
       _formKey.currentState!.validate();
-
     } else {
       segundoNombreValidator_ = null;
       _formKey.currentState!.validate();
-
     }
   }
 
@@ -460,32 +492,26 @@ class _RegistroChazeroVistaState extends State<RegistroChazeroVista> {
     if (primerApellidoController.text.isEmpty) {
       primerApellidoValidator_ = "Ingrese su apellido";
       _formKey.currentState!.validate();
-
     } else if (!regExp.hasMatch(primerApellidoController.text)) {
       primerApellidoValidator_ = "Ingrese un apellido valido";
       _formKey.currentState!.validate();
-
     } else {
       primerApellidoValidator_ = null;
       _formKey.currentState!.validate();
-
     }
   }
 
   void segundoApellidoValidator() {
     RegExp regExp = RegExp(r"^[a-zA-Z]+$");
     if (segundoApellidoController.text.isEmpty) {
-      segundoApellidoValidator_ = "Ingrese su apellido";
+      segundoApellidoValidator_ = null;
       _formKey.currentState!.validate();
-
     } else if (!regExp.hasMatch(segundoApellidoController.text)) {
       segundoApellidoValidator_ = "Ingrese un apellido valido";
       _formKey.currentState!.validate();
-
     } else {
       segundoApellidoValidator_ = null;
       _formKey.currentState!.validate();
-
     }
   }
 
@@ -494,10 +520,98 @@ class _RegistroChazeroVistaState extends State<RegistroChazeroVista> {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => const MenuChazeroVista(),
+        builder: (BuildContext context) => MenuChazeroVista(FirebaseAuth.instance.currentUser?.uid.toString().trim()),
       ),
       //Esta funcion es para decidir hasta donde hacer pop, ej: ModalRoute.withName('/'));, como está ahí borra todoo
       (_) => false,
     );
+  }
+}
+
+class AgreeCheck extends StatefulWidget {
+  const AgreeCheck({super.key});
+
+  @override
+  State<AgreeCheck> createState() => _Checkbox();
+}
+
+class _Checkbox extends State<AgreeCheck> {
+  @override
+  Widget build(BuildContext context) {
+    Color getColor(Set<WidgetState> states) {
+      const Set<WidgetState> interactiveStates = <WidgetState>{
+        WidgetState.pressed,
+        WidgetState.hovered,
+        WidgetState.focused,
+      };
+      if (states.any(interactiveStates.contains)) {
+        return colorTrabajador;
+      }
+      return colorPrincipal;
+    }
+
+    return SizedBox(
+        width: 250.0,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Checkbox(
+                checkColor: colorBackground,
+                fillColor: WidgetStateProperty.resolveWith(getColor),
+                value: isChecked,
+                onChanged: (bool? value) {
+                  setState(() {
+                    isChecked = value!;
+                  });
+                }),
+            Expanded(
+                child: RichText(
+                    text: TextSpan(children: [
+                      const TextSpan(
+                        text: 'Acepto los ', // el texto que quieres mostrar
+                        style: TextStyle(
+                            color: Colors.black, // Establece el color del texto
+                            fontSize: 14.0, // Establece el tamaño del texto
+                            fontFamily: "Inder",
+                            fontWeight: FontWeight.normal),
+                      ),
+                      TextSpan(
+                          text: 'términos y condiciones',
+                          style: const TextStyle(
+                              color: colorPrincipal, // Establece el color del texto
+                              fontSize: 14.0, // Establece el tamaño del texto
+                              fontFamily: "Inder",
+                              fontWeight: FontWeight.normal),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () async {
+                              const String terminos =
+                                  'https://doc-hosting.flycricket.io/chazaunapp-terms-of-use/61d6b708-bd87-4bb3-8392-cc8b9ab1fe48/terms';
+                              launchUrl(Uri.parse(terminos));
+                            }),
+                      const TextSpan(
+                        text: ' y nuestra ', // el texto que quieres mostrar
+                        style: TextStyle(
+                            color: Colors.black, // Establece el color del texto
+                            fontSize: 14.0, // Establece el tamaño del texto
+                            fontFamily: "Inder",
+                            fontWeight: FontWeight.normal),
+                      ),
+                      TextSpan(
+                          text: 'política de privacidad.',
+                          style: const TextStyle(
+                              color: colorPrincipal, // Establece el color del texto
+                              fontSize: 14.0, // Establece el tamaño del texto
+                              fontFamily: "Inder",
+                              fontWeight: FontWeight.normal),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () async {
+                              const String politica =
+                                  'https://doc-hosting.flycricket.io/chazaunapp-privacy-policy/f674154c-f1f3-4291-a55f-77743561a2b2/privacy';
+                              launchUrl(Uri.parse(politica));
+                            })
+                    ]))),
+          ],
+        ));
   }
 }

@@ -44,7 +44,7 @@ class VerificacionEmailState extends State<VerificacionEmail> {
     });
     if (verificado){
       await FirebaseAuth.instance.currentUser?.reload();
-      print(FirebaseAuth.instance.currentUser);
+      //print(FirebaseAuth.instance.currentUser);
       await goMenu();
     }
   }
